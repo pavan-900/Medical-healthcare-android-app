@@ -12,6 +12,8 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedToggleIndex = 0; // Index for toggle button
   final GlobalKey<AnimatedListState> _animatedListKey = GlobalKey<AnimatedListState>();
+  final ScrollController _scrollController = ScrollController();
+  Timer? _scrollTimer;
 
   final List<Map<String, dynamic>> drawerItems = [
     {'title': 'Home', 'icon': Icons.home},
@@ -33,10 +35,48 @@ class _HomePageState extends State<HomePage> {
     {'name': 'Liver', 'image': 'assets/images/liver2.jpg', 'genes': 490},
     {'name': 'Obesity', 'image': 'assets/images/obesity.png', 'genes': 100},
     {'name': 'Cancer', 'image': 'assets/images/cancer.webp', 'genes': 50},
+    {'name': 'Depression', 'image': 'assets/images/Depression.png', 'genes': 120},
+    {'name': 'Cholesterol', 'image': 'assets/images/cholestral.webp', 'genes': 300},
+    {'name': 'Diabetes_mellitus', 'image': 'assets/images/diabetes-milleus.png', 'genes': 250},
   ];
 
   final int totalGenes = 500;
   bool _isDrawerOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoScroll();
+  }
+
+  @override
+  void dispose() {
+    _scrollTimer?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _startAutoScroll() {
+    const scrollDuration = Duration(milliseconds: 100);
+    const scrollOffset = 10.0;
+
+    _scrollTimer = Timer.periodic(scrollDuration, (timer) {
+      if (_scrollController.hasClients) {
+        final maxScrollExtent = _scrollController.position.maxScrollExtent;
+        final currentScroll = _scrollController.offset;
+
+        if (currentScroll + scrollOffset >= maxScrollExtent) {
+          _scrollController.jumpTo(0); // Reset to start
+        } else {
+          _scrollController.animateTo(
+            currentScroll + scrollOffset,
+            duration: scrollDuration,
+            curve: Curves.linear,
+          );
+        }
+      }
+    });
+  }
 
   void _onToggleButtonPressed(int index) {
     setState(() {
@@ -108,6 +148,90 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCircularCards() {
+    return Column(
+      children: diseaseData.map((disease) {
+        final progress = (disease['genes'] / totalGenes).toDouble();
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SearchPage(diseaseName: disease['name']),
+              ),
+            );
+          },
+          child: Card(
+            margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            elevation: 10,
+            shadowColor: Colors.black38,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      ClipOval(
+                        child: Image.asset(
+                          disease['image'],
+                          height: 60,
+                          width: 60,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SizedBox(width: 15),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            disease['name'],
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey[800]),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            '${disease['genes']} Genes',
+                            style: TextStyle(fontSize: 14, color: Colors.blueGrey[600]),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: CircularProgressIndicator(
+                          value: progress,
+                          strokeWidth: 8,
+                          backgroundColor: Colors.grey[300],
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            progress < 0.5
+                                ? Colors.red
+                                : progress < 0.8
+                                ? Colors.orange
+                                : Colors.green,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${(progress * 100).toStringAsFixed(1)}%',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueGrey[800]),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -193,7 +317,6 @@ class _HomePageState extends State<HomePage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Toggle Button for Views
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
                 child: Row(
@@ -209,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: Text('Bar Chart', style: TextStyle(fontSize: 16)),
+                          child: Text('Row View', style: TextStyle(fontSize: 16)),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -220,70 +343,122 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              // View based on Toggle Button
               _selectedToggleIndex == 0
-                  ? Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  color: Colors.black,
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Overall Disease Statistics',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
-                        ),
-                        SizedBox(height: 20),
-                        AspectRatio(
-                          aspectRatio: 1.5,
-                          child: BarChart(
-                            BarChartData(
-                              alignment: BarChartAlignment.spaceAround,
-                              barGroups: _generateBarGroups(),
-                              titlesData: FlTitlesData(
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    getTitlesWidget: (value, meta) {
-                                      final int index = value.toInt();
-                                      if (index >= 0 && index < diseaseData.length) {
-                                        return Text(
-                                          diseaseData[index]['name'],
-                                          style: TextStyle(color: Colors.white, fontSize: 12),
-                                        );
-                                      }
-                                      return const Text('');
-                                    },
-                                  ),
-                                ),
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    getTitlesWidget: (value, meta) {
-                                      return Text(
-                                        '${value.toInt()}',
-                                        style: TextStyle(color: Colors.white, fontSize: 12),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              ),
-                              gridData: FlGridData(show: false),
-                              borderData: FlBorderData(show: false),
+                  ? Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      color: Colors.black,
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Overall Disease Statistics',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.white),
                             ),
-                          ),
+                            SizedBox(height: 20),
+                            Row(
+                              children: [
+                                // Fixed Y-Axis
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: List.generate(
+                                    6,
+                                        (index) => Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Text(
+                                        '${index * 100}',
+                                        style: TextStyle(color: Colors.white, fontSize: 10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                // Auto-Scrolling Bar Chart
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 300,
+                                    child: SingleChildScrollView(
+                                      controller: _scrollController,
+                                      scrollDirection: Axis.horizontal,
+                                      child: SizedBox(
+                                        width: diseaseData.length * 60,
+                                        child: BarChart(
+                                          BarChartData(
+                                            alignment: BarChartAlignment.spaceBetween,
+                                            barGroups: _generateBarGroups(),
+                                            titlesData: FlTitlesData(
+                                              bottomTitles: AxisTitles(
+                                                sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, meta) {
+                                                    final int index = value.toInt();
+                                                    if (index >= 0 &&
+                                                        index < diseaseData.length) {
+                                                      return Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(top: 8.0),
+                                                        child: Text(
+                                                          diseaseData[index]['name'],
+                                                          style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 10),
+                                                        ),
+                                                      );
+                                                    }
+                                                    return const Text('');
+                                                  },
+                                                ),
+                                              ),
+                                              topTitles: AxisTitles(
+                                                  sideTitles: SideTitles(showTitles: false)),
+                                              rightTitles: AxisTitles(
+                                                  sideTitles: SideTitles(showTitles: false)),
+                                              leftTitles: AxisTitles(
+                                                sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  reservedSize: 30,
+                                                  getTitlesWidget: (value, meta) {
+                                                    if (value % 100 == 0) {
+                                                      return Text(
+                                                        '${value.toInt()}',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 10,
+                                                        ),
+                                                      );
+                                                    }
+                                                    return Container();
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            gridData: FlGridData(show: false),
+                                            borderData: FlBorderData(show: false),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                  _buildCircularCards(), // Circular cards below the bar chart
+                ],
               )
                   : Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15),
@@ -306,7 +481,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SearchPage(diseaseName: disease['name']),
+                            builder: (context) =>
+                                SearchPage(diseaseName: disease['name']),
                           ),
                         );
                       },
@@ -347,7 +523,11 @@ class _HomePageState extends State<HomePage> {
                                   minHeight: 10,
                                   backgroundColor: Colors.grey[300],
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                    progress < 0.5 ? Colors.red : progress < 0.8 ? Colors.orange : Colors.green,
+                                    progress < 0.5
+                                        ? Colors.red
+                                        : progress < 0.8
+                                        ? Colors.orange
+                                        : Colors.green,
                                   ),
                                 ),
                               ),
@@ -355,7 +535,8 @@ class _HomePageState extends State<HomePage> {
                             SizedBox(height: 5),
                             Text(
                               '${disease['genes']} of $totalGenes Genes',
-                              style: TextStyle(fontSize: 14, color: Colors.blueGrey[600]),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.blueGrey[600]),
                             ),
                           ],
                         ),

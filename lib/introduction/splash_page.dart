@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import '../introduction/welcome_page.dart'; // Updated path to WelcomePage
 
 class SplashPage extends StatefulWidget {
   @override
@@ -21,11 +21,11 @@ class _SplashPageState extends State<SplashPage> {
       });
     });
 
-    // Navigate to HomePage after 7 seconds
+    // Navigate to WelcomePage after 5 seconds
     Timer(Duration(seconds: 5), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => WelcomePage()),
       );
     });
   }
@@ -37,17 +37,17 @@ class _SplashPageState extends State<SplashPage> {
         children: [
           // Background color
           Container(
-            color: Colors.white, // Background color set to white
+            color: Colors.white,
           ),
           // Animated logo
           AnimatedPositioned(
-            duration: Duration(seconds: 2), // Animation duration
-            curve: Curves.easeOut, // Smooth curve
-            bottom: _logoVisible ? MediaQuery.of(context).size.height / 2 - 250 : -500, // Adjusted for larger image
-            left: MediaQuery.of(context).size.width / 2 - 250, // Adjusted for larger image
+            duration: Duration(seconds: 2),
+            curve: Curves.easeOut,
+            bottom: _logoVisible ? MediaQuery.of(context).size.height / 2 - 250 : -500,
+            left: MediaQuery.of(context).size.width / 2 - 250,
             child: Container(
-              width: 500, // Significantly increased width
-              height: 500, // Significantly increased height
+              width: 500,
+              height: 500,
               child: Image.asset(
                 'assets/images/splashlogo.png', // Path to your logo
                 fit: BoxFit.contain,

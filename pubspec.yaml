@@ -12,6 +12,7 @@ dependencies:
   firebase_auth: ^5.1.3  # Optional
   firebase_storage: ^12.1.2  # Optional
   fl_chart: ^0.68.0
+  pie_chart: ^5.0.0
 
 dev_dependencies:
   flutter_test:

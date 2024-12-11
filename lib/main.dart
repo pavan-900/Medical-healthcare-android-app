@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'pages/splash_page.dart';
+import 'introduction/splash_page.dart'; // Updated import path
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Gene Search App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: SplashPage(), // Set SplashPage as the initial page
+      home: SplashPage(), // SplashPage as the initial page
     );
   }
 }
