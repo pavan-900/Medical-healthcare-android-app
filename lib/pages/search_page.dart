@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart' as pc;
 import '../services/gene_service.dart';
+import '../services/gene_api_service.dart'; // Import for API service
 import '../models/gene.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'references_page.dart'; // Import the ReferencesPage
 
 class SearchPage extends StatefulWidget {
   final String diseaseName;
@@ -15,6 +18,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController geneController = TextEditingController();
   final GeneService geneService = GeneService();
+  final GeneAPIService geneAPIService = GeneAPIService(); // API service instance
   String? geneName;
   int? geneScore;
   bool showResult = false;
@@ -107,11 +111,28 @@ class _SearchPageState extends State<SearchPage> {
       await geneService.fetchGenesByCondition(widget.diseaseName, enteredGene);
 
       if (geneData.isNotEmpty) {
-        setState(() {
-          geneName = geneData.first.geneName;
-          geneScore = geneData.first.geneScore;
-          showResult = true;
-        });
+        final geneName = geneData.first.geneName;
+        final pharmGKBId = await geneAPIService.fetchPharmGKBId(geneName);
+
+        if (pharmGKBId != null) {
+          // Navigate to ReferencesPage with PharmGKB ID
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  ReferencesPage(
+                    geneSymbol: geneName,
+                    pharmGKBId: pharmGKBId,
+                  ),
+            ),
+          );
+        } else {
+          setState(() {
+            this.geneName = "No PharmGKB ID found for $geneName";
+            this.geneScore = null;
+            showResult = true;
+          });
+        }
       } else {
         setState(() {
           geneName = "No results found";
@@ -184,11 +205,13 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide(color: Colors.blueGrey[700]!, width: 2),
+                    borderSide: BorderSide(
+                        color: Colors.blueGrey[700]!, width: 2),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide(color: Colors.blueGrey[900]!, width: 3),
+                    borderSide: BorderSide(
+                        color: Colors.blueGrey[900]!, width: 3),
                   ),
                 ),
                 style: TextStyle(fontSize: 18, color: Colors.blueGrey[900]),
@@ -293,7 +316,10 @@ class _SearchPageState extends State<SearchPage> {
                   dataMap: pieChartData,
                   animationDuration: Duration(milliseconds: 800),
                   chartLegendSpacing: 32,
-                  chartRadius: MediaQuery.of(context).size.width / 2.5,
+                  chartRadius: MediaQuery
+                      .of(context)
+                      .size
+                      .width / 2.5,
                   colorList: [
                     Colors.red,
                     Colors.orange,

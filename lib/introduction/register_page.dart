@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../introduction/airdrop_page.dart'; // Update the path to AirdropPage
-
+import '../pages/home_page.dart';
 class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class RegisterPage extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => AirdropPage()), // Skip to AirdropPage
+                MaterialPageRoute(builder: (context) => HomePage()), // Skip to AirdropPage
               );
             },
             child: Text(
@@ -98,7 +98,7 @@ class RegisterPage extends StatelessWidget {
                         transitionsBuilder: (_, animation, __, child) {
                           return SlideTransition(
                             position: Tween<Offset>(
-                              begin: Offset(0, 1), // Start from the bottom
+                              begin: Offset(-1, 0), // Start from the bottom
                               end: Offset(0, 0), // End at the center
                             ).animate(animation),
                             child: child,

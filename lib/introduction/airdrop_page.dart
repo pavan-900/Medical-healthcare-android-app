@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../introduction/third_page.dart'; // Import ThirdPage
-
+import '../pages/home_page.dart';
 class AirdropPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class AirdropPage extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => ThirdPage()), // Skip to ThirdPage
+                MaterialPageRoute(builder: (context) => HomePage()), // Skip to ThirdPage
               );
             },
             child: Text(
@@ -99,7 +99,7 @@ class AirdropPage extends StatelessWidget {
                         transitionsBuilder: (_, animation, __, child) {
                           return SlideTransition(
                             position: Tween<Offset>(
-                              begin: Offset(1, 0), // Start from right
+                              begin: Offset(-1, 0), // Start from right
                               end: Offset(0, 0), // End at the center
                             ).animate(animation),
                             child: child,

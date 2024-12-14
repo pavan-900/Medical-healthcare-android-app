@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../introduction/SignupPromptPage.dart'; // Update path for SignupPromptPage
 import '../pages/home_page.dart'; // Update path for HomePage if necessary
-
 class ThirdPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

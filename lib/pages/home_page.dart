@@ -2,6 +2,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart'; // For bar chart visualization
 import 'search_page.dart';
+import '../Drawer/home.dart';
+import '../Drawer/about.dart';
+import '../Drawer/feedback.dart';
+import '../Drawer/profile.dart';
+import '../Drawer/settings.dart';
+import '../Drawer/help.dart';
+import '../Drawer/terms.dart';
+
+
+
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -16,17 +27,18 @@ class _HomePageState extends State<HomePage> {
   Timer? _scrollTimer;
 
   final List<Map<String, dynamic>> drawerItems = [
-    {'title': 'Home', 'icon': Icons.home},
-    {'title': 'Profile', 'icon': Icons.person},
-    {'title': 'Settings', 'icon': Icons.settings},
-    {'title': 'Notifications', 'icon': Icons.notifications},
-    {'title': 'Help', 'icon': Icons.help},
-    {'title': 'Privacy', 'icon': Icons.lock},
-    {'title': 'Terms', 'icon': Icons.description},
-    {'title': 'Feedback', 'icon': Icons.feedback},
-    {'title': 'About', 'icon': Icons.info},
-    {'title': 'Logout', 'icon': Icons.exit_to_app},
+    {'title': 'Home', 'icon': Icons.home, 'page': home()},
+    {'title': 'Profile', 'icon': Icons.person, 'page': profile()},
+    {'title': 'Settings', 'icon': Icons.settings, 'page': settings()},
+    //{'title': 'Notifications', 'icon': Icons.notifications, 'page': Notifications()},
+    {'title': 'Help', 'icon': Icons.help, 'page': help()},
+     // {'title': 'Privacy', 'icon': Icons.lock, 'page': Privacy()},
+    {'title': 'Terms', 'icon': Icons.description, 'page':  terms()},
+    {'title': 'Feedback', 'icon': Icons.feedback, 'page': feedback()},
+    {'title': 'About', 'icon': Icons.info, 'page': About()},
+   // {'title': 'Logout', 'icon': Icons.exit_to_app, 'page': Logout()},
   ];
+
 
   final List<Map<String, dynamic>> diseaseData = [
     {'name': 'Anxiety', 'image': 'assets/images/anxietyy.png', 'genes': 100},
@@ -41,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final int totalGenes = 500;
-  bool _isDrawerOpen = false;
+  bool _isDrawerOpen = false; // Tracks if the drawer is open
 
   @override
   void initState() {
@@ -112,7 +124,11 @@ class _HomePageState extends State<HomePage> {
         opacity: animation,
         child: GestureDetector(
           onTap: () {
-            print('Tapped on: ${item['title']}');
+            // Navigate to the corresponding page based on the drawer item
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => item['page']),
+            );
           },
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -125,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.grey.withOpacity(0.3),
                   blurRadius: 6,
                   spreadRadius: 2,
-                  offset: Offset(2, 3),
+                  offset: Offset(2, 3), // Shadow position
                 ),
               ],
             ),
@@ -235,6 +251,31 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  List<BarChartGroupData> _generateBarGroups() {
+    return diseaseData.asMap().entries.map((entry) {
+      final int index = entry.key;
+      final Map<String, dynamic> disease = entry.value;
+      final double barValue = disease['genes'].toDouble();
+
+      return BarChartGroupData(
+        x: index,
+        barRods: [
+          BarChartRodData(
+            toY: barValue,
+            color: barValue < 100
+                ? Colors.red
+                : barValue < 200
+                ? Colors.yellow
+                : Colors.green,
+            width: 20,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ],
+        showingTooltipIndicators: [0],
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -253,7 +294,7 @@ class _HomePageState extends State<HomePage> {
           icon: AnimatedSwitcher(
             duration: Duration(milliseconds: 300),
             child: _isDrawerOpen
-                ? Icon(Icons.close, color: Colors.white, size: 30, key: ValueKey('close'))
+                ? Icon(Icons.menu, color: Colors.white, size: 30, key: ValueKey('close'))
                 : Icon(Icons.menu, color: Colors.white, size: 30, key: ValueKey('menu')),
           ),
           onPressed: () {
@@ -265,6 +306,7 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ),
+
       drawer: Drawer(
         child: Stack(
           children: [
@@ -368,22 +410,6 @@ class _HomePageState extends State<HomePage> {
                             SizedBox(height: 20),
                             Row(
                               children: [
-                                // Fixed Y-Axis
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: List.generate(
-                                    6,
-                                        (index) => Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(
-                                        '${index * 100}',
-                                        style: TextStyle(color: Colors.white, fontSize: 10),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                // Auto-Scrolling Bar Chart
                                 Expanded(
                                   child: SizedBox(
                                     height: 300,
@@ -406,12 +432,13 @@ class _HomePageState extends State<HomePage> {
                                                         index < diseaseData.length) {
                                                       return Padding(
                                                         padding:
-                                                        const EdgeInsets.only(top: 8.0),
+                                                        const EdgeInsets.only(
+                                                            top: 8.0),
                                                         child: Text(
                                                           diseaseData[index]['name'],
                                                           style: TextStyle(
                                                               color: Colors.white,
-                                                              fontSize: 10),
+                                                              fontSize: 8),
                                                         ),
                                                       );
                                                     }
@@ -420,30 +447,45 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ),
                                               topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(showTitles: false)),
+                                                  sideTitles:
+                                                  SideTitles(showTitles: false)),
                                               rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(showTitles: false)),
+                                                  sideTitles:
+                                                  SideTitles(showTitles: false)),
                                               leftTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: true,
-                                                  reservedSize: 30,
-                                                  getTitlesWidget: (value, meta) {
-                                                    if (value % 100 == 0) {
-                                                      return Text(
-                                                        '${value.toInt()}',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 10,
-                                                        ),
-                                                      );
-                                                    }
-                                                    return Container();
-                                                  },
-                                                ),
+                                                  sideTitles:
+                                                  SideTitles(showTitles: false)),
+                                            ),
+                                            barTouchData: BarTouchData(
+                                              enabled: true,
+                                              touchTooltipData:
+                                              BarTouchTooltipData(
+                                                tooltipPadding:
+                                                EdgeInsets.all(8),
+                                                tooltipMargin: 8,
+
+                                                tooltipRoundedRadius: 8,
+                                                fitInsideHorizontally: true,
+                                                fitInsideVertically: true,
+                                                getTooltipItem: (group,
+                                                    groupIndex, rod,
+                                                    rodIndex) {
+                                                  return BarTooltipItem(
+                                                    rod.toY
+                                                        .toStringAsFixed(0),
+                                                    TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                      FontWeight.bold,
+                                                    ),
+                                                  );
+                                                },
                                               ),
                                             ),
-                                            gridData: FlGridData(show: false),
-                                            borderData: FlBorderData(show: false),
+                                            gridData: FlGridData(
+                                                show: false),
+                                            borderData: FlBorderData(
+                                                show: false),
                                           ),
                                         ),
                                       ),
@@ -457,7 +499,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  _buildCircularCards(), // Circular cards below the bar chart
+                  _buildCircularCards(),
                 ],
               )
                   : Padding(
@@ -515,14 +557,17 @@ class _HomePageState extends State<HomePage> {
                             ),
                             SizedBox(height: 5),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15.0),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(5),
+                                borderRadius:
+                                BorderRadius.circular(5),
                                 child: LinearProgressIndicator(
                                   value: progress,
                                   minHeight: 10,
                                   backgroundColor: Colors.grey[300],
-                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                  valueColor:
+                                  AlwaysStoppedAnimation<Color>(
                                     progress < 0.5
                                         ? Colors.red
                                         : progress < 0.8
@@ -536,7 +581,8 @@ class _HomePageState extends State<HomePage> {
                             Text(
                               '${disease['genes']} of $totalGenes Genes',
                               style: TextStyle(
-                                  fontSize: 14, color: Colors.blueGrey[600]),
+                                  fontSize: 14,
+                                  color: Colors.blueGrey[600]),
                             ),
                           ],
                         ),
@@ -550,28 +596,5 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  List<BarChartGroupData> _generateBarGroups() {
-    return diseaseData.asMap().entries.map((entry) {
-      final int index = entry.key;
-      final Map<String, dynamic> disease = entry.value;
-      final double barValue = disease['genes'].toDouble();
-      return BarChartGroupData(
-        x: index,
-        barRods: [
-          BarChartRodData(
-            toY: barValue,
-            color: barValue < 100
-                ? Colors.red
-                : barValue < 200
-                ? Colors.yellow
-                : Colors.green,
-            width: 20,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ],
-      );
-    }).toList();
   }
 }
