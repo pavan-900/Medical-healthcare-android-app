@@ -32,11 +32,11 @@ class _HomePageState extends State<HomePage> {
     {'title': 'Settings', 'icon': Icons.settings, 'page': settings()},
     //{'title': 'Notifications', 'icon': Icons.notifications, 'page': Notifications()},
     {'title': 'Help', 'icon': Icons.help, 'page': help()},
-     // {'title': 'Privacy', 'icon': Icons.lock, 'page': Privacy()},
+    // {'title': 'Privacy', 'icon': Icons.lock, 'page': Privacy()},
     {'title': 'Terms', 'icon': Icons.description, 'page':  terms()},
     {'title': 'Feedback', 'icon': Icons.feedback, 'page': feedback()},
     {'title': 'About', 'icon': Icons.info, 'page': About()},
-   // {'title': 'Logout', 'icon': Icons.exit_to_app, 'page': Logout()},
+    // {'title': 'Logout', 'icon': Icons.exit_to_app, 'page': Logout()},
   ];
 
 
@@ -598,3 +598,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+

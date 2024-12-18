@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../services/gene_api_service.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class ReferencesPage extends StatefulWidget {
   final String geneSymbol;
-  final String pharmGKBId; // Add this parameter
+  final String pharmGKBId;
 
   ReferencesPage({required this.geneSymbol, required this.pharmGKBId});
 
@@ -30,6 +31,14 @@ class _ReferencesPageState extends State<ReferencesPage> {
       references = fetchedReferences;
       isLoading = false;
     });
+  }
+
+  void _openWebView(String url) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebViewPage(url: url),
+      ),
+    );
   }
 
   @override
@@ -72,11 +81,19 @@ class _ReferencesPageState extends State<ReferencesPage> {
                       ),
                     ),
                     SizedBox(height: 5),
-                    Text(
-                      reference['url'] ?? 'No URL',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.blueGrey[700],
+                    GestureDetector(
+                      onTap: () {
+                        if (reference['url'] != null) {
+                          _openWebView(reference['url']!);
+                        }
+                      },
+                      child: Text(
+                        reference['url'] ?? 'No URL',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
                   ],
@@ -85,6 +102,30 @@ class _ReferencesPageState extends State<ReferencesPage> {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class WebViewPage extends StatelessWidget {
+  final String url;
+
+  const WebViewPage({Key? key, required this.url}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Reference'),
+      ),
+      body: InAppWebView(
+        initialUrlRequest: URLRequest(url: WebUri(url)),
+        onLoadStart: (controller, url) {
+          // Optional: Show loading indicator
+        },
+        onLoadStop: (controller, url) {
+          // Optional: Hide loading indicator
+        },
       ),
     );
   }

@@ -39,7 +39,7 @@ class WelcomePage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40.0),
                   child: Text(
-                    "Move insurance to the realm of crypto!",
+                    "Welcome to GenePowerX!",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,

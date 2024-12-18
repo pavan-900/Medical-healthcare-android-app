@@ -22,6 +22,7 @@ class _SearchPageState extends State<SearchPage> {
   String? geneName;
   int? geneScore;
   bool showResult = false;
+  String? pharmGKBId;
 
   // Static gene score data for diseases
   final Map<String, Map<String, double>> diseaseGeneScores = {
@@ -111,26 +112,22 @@ class _SearchPageState extends State<SearchPage> {
       await geneService.fetchGenesByCondition(widget.diseaseName, enteredGene);
 
       if (geneData.isNotEmpty) {
-        final geneName = geneData.first.geneName;
-        final pharmGKBId = await geneAPIService.fetchPharmGKBId(geneName);
+        setState(() {
+          geneName = geneData.first.geneName;
+          geneScore = geneData.first.geneScore;  // Fetch the gene score
+          showResult = true;
+        });
 
-        if (pharmGKBId != null) {
-          // Navigate to ReferencesPage with PharmGKB ID
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  ReferencesPage(
-                    geneSymbol: geneName,
-                    pharmGKBId: pharmGKBId,
-                  ),
-            ),
-          );
+        // After displaying the gene info, try fetching PharmGKB ID
+        final fetchedPharmGKBId = await geneAPIService.fetchPharmGKBId(geneName!);
+
+        if (fetchedPharmGKBId != null) {
+          setState(() {
+            pharmGKBId = fetchedPharmGKBId; // Save PharmGKB ID
+          });
         } else {
           setState(() {
-            this.geneName = "No PharmGKB ID found for $geneName";
-            this.geneScore = null;
-            showResult = true;
+            pharmGKBId = null;
           });
         }
       } else {
@@ -189,6 +186,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               SizedBox(height: 30),
+              // TextField with Search Icon added
               TextField(
                 controller: geneController,
                 decoration: InputDecoration(
@@ -200,18 +198,20 @@ class _SearchPageState extends State<SearchPage> {
                     color: Colors.blueGrey[700],
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide(color: Colors.blueGrey[700]!),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide(
-                        color: Colors.blueGrey[700]!, width: 2),
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide(color: Colors.blueGrey[700]!, width: 2),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide(
-                        color: Colors.blueGrey[900]!, width: 3),
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide(color: Colors.blueGrey[900]!, width: 3),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.search),
+                    onPressed: _searchGene, // Trigger search on icon click
                   ),
                 ),
                 style: TextStyle(fontSize: 18, color: Colors.blueGrey[900]),
@@ -221,7 +221,7 @@ class _SearchPageState extends State<SearchPage> {
               ElevatedButton(
                 onPressed: _searchGene,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueGrey[900],
+                  backgroundColor: Colors.blueGrey[900],  // Corrected here
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
@@ -287,6 +287,39 @@ class _SearchPageState extends State<SearchPage> {
                             color: Colors.blueGrey[800],
                           ),
                         ),
+                        if (pharmGKBId != null) ...[
+                          SizedBox(height: 15),
+                          Center(  // Centered the button
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ReferencesPage(
+                                      geneSymbol: geneName!,  // Added geneSymbol here
+                                      pharmGKBId: pharmGKBId!,
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blueGrey[900],
+                                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30)
+                                ),
+                              ),
+                              child: Text(
+                                'View References',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]
                       ] else
                         Text(
                           geneName!,
@@ -316,10 +349,7 @@ class _SearchPageState extends State<SearchPage> {
                   dataMap: pieChartData,
                   animationDuration: Duration(milliseconds: 800),
                   chartLegendSpacing: 32,
-                  chartRadius: MediaQuery
-                      .of(context)
-                      .size
-                      .width / 2.5,
+                  chartRadius: MediaQuery.of(context).size.width / 2.5,
                   colorList: [
                     Colors.red,
                     Colors.orange,

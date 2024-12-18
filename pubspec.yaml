@@ -18,7 +18,8 @@ dependencies:
 #  google_api_availability: ^3.0.2 # For checking Google Play Services availability
 
   # Uncomment `url_launcher` if you need to open URLs.
-  # url_launcher: ^6.1.7           # For opening URLs in a browser (optional)
+#  url_launcher: ^6.3.1         # For opening URLs in a browser (optional)
+  flutter_inappwebview: ^6.1.5
 
 dev_dependencies:
   flutter_test:

@@ -37,7 +37,7 @@ android {
 dependencies {
     implementation 'com.google.firebase:firebase-analytics:22.1.2'  // Latest version of Firebase Analytics
     implementation 'com.google.android.gms:play-services-base:18.5.0' // Correct version of play-services
-    implementation 'com.google.android.gms:play-services-auth:21.2.0' // Correct version of play-services-auth
+    implementation 'com.google.android.gms:play-services-auth:21.3.0' // Correct version of play-services-auth
     implementation 'com.google.android.gms:play-services-identity:18.1.0' // Add play-services-identity for related services
 
     // Add any other necessary Firebase dependencies

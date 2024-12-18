@@ -51,7 +51,7 @@ class ThirdPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Lorem ipsum dolor sit amet",
+                    "Gene Search",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24,
@@ -61,7 +61,7 @@ class ThirdPage extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                    " Find detailed information about specific genes linked to a disease.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,

@@ -52,7 +52,7 @@ class SignupPromptPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Lorem Ipsum Placeholder", // Title text
+                    "Interactive Charts and References", // Title text
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24,
@@ -62,8 +62,7 @@ class SignupPromptPage extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-                        "Suspendisse varius enim in eros elementum tristique.",
+                    "Visualize gene data with pie charts for a better understanding of gene distributions in specific diseases.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,

@@ -60,7 +60,7 @@ class RegisterPage extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "Register and verify your profile through KYC verification or a Coinbase/Binance account",
+                    "Register and verify your profile through Email Verification",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,

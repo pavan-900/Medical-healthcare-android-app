@@ -51,7 +51,7 @@ class AirdropPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Get airdropped tokens in calamities", // Placeholder title
+                    "Gene Scores", // Placeholder title
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24,
@@ -61,7 +61,7 @@ class AirdropPage extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "In times of calamity, we will automatically airdrop our tokens into your wallets.",
+                    " Analyze gene scores for different diseases to understand the genetic factors at play.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
@@ -94,7 +94,7 @@ class AirdropPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        transitionDuration: Duration(milliseconds: 1000), // Smooth slow animation
+                        transitionDuration: Duration(milliseconds: 700), // Smooth slow animation
                         pageBuilder: (_, __, ___) => ThirdPage(), // Navigate to ThirdPage
                         transitionsBuilder: (_, animation, __, child) {
                           return SlideTransition(
