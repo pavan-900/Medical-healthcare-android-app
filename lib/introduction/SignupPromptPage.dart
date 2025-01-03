@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../pages/home_page.dart'; // Update path for HomePage
 import '../introduction/signup_page.dart'; // Update path for SignupPage
+import '../auth/sign-up_page.dart';
+import '../auth/sign-in_page.dart';
 
 class SignupPromptPage extends StatelessWidget {
   @override
@@ -82,8 +84,8 @@ class SignupPromptPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        transitionDuration: Duration(milliseconds: 1000), // Slower animation (1 second)
-                        pageBuilder: (_, __, ___) => SignupPage(), // Navigate to SignupPage
+                        transitionDuration: Duration(milliseconds: 500), // Slower animation (1 second)
+                        pageBuilder: (_, __, ___) => SignUpPage(), // Navigate to SignupPage
                         transitionsBuilder: (_, animation, __, child) {
                           return SlideTransition(
                             position: Tween<Offset>(
@@ -121,7 +123,7 @@ class SignupPromptPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => HomePage()), // Direct to HomePage
+                      MaterialPageRoute(builder: (context) => SignInPage()), // Direct to HomePage
                     );
                   },
                   child: Text(

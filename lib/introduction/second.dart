@@ -94,7 +94,7 @@ class AirdropPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        transitionDuration: Duration(milliseconds: 700), // Smooth slow animation
+                        transitionDuration: Duration(milliseconds: 500), // Smooth slow animation
                         pageBuilder: (_, __, ___) => ThirdPage(), // Navigate to ThirdPage
                         transitionsBuilder: (_, animation, __, child) {
                           return SlideTransition(

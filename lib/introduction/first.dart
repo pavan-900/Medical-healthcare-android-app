@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../introduction/airdrop_page.dart'; // Update the path to AirdropPage
+import '../introduction/second.dart'; // Update the path to AirdropPage
 import '../pages/home_page.dart';
 class RegisterPage extends StatelessWidget {
   @override
@@ -93,7 +93,7 @@ class RegisterPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        transitionDuration: Duration(milliseconds: 1000), // Slower animation (1 second)
+                        transitionDuration: Duration(milliseconds: 500), // Slower animation (1 second)
                         pageBuilder: (_, __, ___) => AirdropPage(),
                         transitionsBuilder: (_, animation, __, child) {
                           return SlideTransition(

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../introduction/welcome_page.dart'; // Updated path to WelcomePage
+import '../auth/sign-in_page.dart'; // Path to Sign-In Page
 
 class SplashPage extends StatefulWidget {
   @override
@@ -21,11 +21,11 @@ class _SplashPageState extends State<SplashPage> {
       });
     });
 
-    // Navigate to WelcomePage after 5 seconds
+    // Navigate to SignInPage after 5 seconds
     Timer(Duration(seconds: 5), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => WelcomePage()),
+        MaterialPageRoute(builder: (context) => SignInPage()),
       );
     });
   }
@@ -43,7 +43,9 @@ class _SplashPageState extends State<SplashPage> {
           AnimatedPositioned(
             duration: Duration(seconds: 2),
             curve: Curves.easeOut,
-            bottom: _logoVisible ? MediaQuery.of(context).size.height / 2 - 250 : -500,
+            bottom: _logoVisible
+                ? MediaQuery.of(context).size.height / 2 - 250
+                : -500,
             left: MediaQuery.of(context).size.width / 2 - 250,
             child: Container(
               width: 500,

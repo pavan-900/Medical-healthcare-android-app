@@ -7,19 +7,25 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  xml: ^6.1.0
   cloud_firestore: ^5.2.0         # Firebase Firestore for database operations
   firebase_core: ^3.3.0          # Core Firebase dependency
   firebase_auth: ^5.1.3          # Optional: for authentication, if needed
   firebase_storage: ^12.1.2      # Optional: for file storage, if needed
   fl_chart: ^0.68.0              # For creating charts, if required
   pie_chart: ^5.0.0              # Dependency for pie charts
-  syncfusion_flutter_charts: ^22.1.34  # For Syncfusion charts
-  http: ^1.2.2                   # Latest stable HTTP package for API requests
+  syncfusion_flutter_charts: ^20.4.38
+  syncfusion_flutter_core: ^20.4.38
+  # For Syncfusion charts
+  http: ^1.2.2
+  syncfusion_flutter_gauges: ^20.4.38 # Latest stable HTTP package for API requests
 #  google_api_availability: ^3.0.2 # For checking Google Play Services availability
 
   # Uncomment `url_launcher` if you need to open URLs.
 #  url_launcher: ^6.3.1         # For opening URLs in a browser (optional)
   flutter_inappwebview: ^6.1.5
+
 
 dev_dependencies:
   flutter_test:

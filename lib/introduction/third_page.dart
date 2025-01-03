@@ -93,7 +93,7 @@ class ThirdPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        transitionDuration: Duration(milliseconds: 1000), // Slower animation (1 second)
+                        transitionDuration: Duration(milliseconds: 500), // Slower animation (1 second)
                         pageBuilder: (_, __, ___) => SignupPromptPage(), // Navigate to SignupPromptPage
                         transitionsBuilder: (_, animation, __, child) {
                           return SlideTransition(

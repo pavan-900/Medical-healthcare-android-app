@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../introduction/register_page.dart'; // Updated path for RegisterPage
+import '../introduction/first.dart'; // Updated path for RegisterPage
 
 class WelcomePage extends StatelessWidget {
   @override
