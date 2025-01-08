@@ -5,8 +5,8 @@ class GeneService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Fetch a gene by condition and check across other conditions.
-  Future<Map<String, dynamic>> fetchGeneAndCheckOtherDiseases(String condition, String geneName) async {
-    print('Checking gene in condition: $condition and then across all diseases if found.');
+  Future<Map<String, dynamic>> fetchGeneAndCheckOtherConditions(String condition, String geneName) async {
+    print('Checking gene in condition: $condition and then across all conditions if found.');
 
     try {
       // Query for the specified condition

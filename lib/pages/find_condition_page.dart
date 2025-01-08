@@ -17,7 +17,6 @@ class _AllGenesSearchPageState extends State<AllGenesSearchPage> {
   void initState() {
     super.initState();
     _geneController.addListener(() {
-      // Automatically convert the text to uppercase
       final text = _geneController.text;
       if (text != text.toUpperCase()) {
         _geneController.value = _geneController.value.copyWith(
@@ -38,7 +37,6 @@ class _AllGenesSearchPageState extends State<AllGenesSearchPage> {
     if (geneName.isNotEmpty) {
       List<Gene> genes = await _geneService.fetchGenesByName(geneName);
 
-      // Filter out duplicates by using a Set and combining geneName, condition, and geneScore
       final seen = <String>{};
       final uniqueGenes = genes.where((gene) {
         final key = '${gene.geneName}-${gene.condition}-${gene.geneScore}';
@@ -68,60 +66,77 @@ class _AllGenesSearchPageState extends State<AllGenesSearchPage> {
         title: Text(
           'Search All Genes',
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.blueGrey[900],
+            fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.blue[400],
-        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Colors.blueGrey[900]),
+        elevation: 4,
+        shadowColor: Colors.grey.withOpacity(0.5),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _geneController,
-              decoration: InputDecoration(
-                labelText: 'Enter Gene Name',
-                border: OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.search, color: Colors.lightBlue),
-                  onPressed: _searchGene,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(20.0),
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: _geneController,
+                decoration: InputDecoration(
+                  labelText: 'Enter Gene Name',
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueGrey[700],
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide(color: Colors.blueGrey[700]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide(color: Colors.blueGrey[900]!, width: 2),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.search, color: Colors.blueGrey[900]),
+                    onPressed: _searchGene,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
+              SizedBox(height: 20),
+              ElevatedButton(
                 onPressed: _searchGene,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+                  backgroundColor: Colors.blueGrey[900],
+                  padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  elevation: 8,
+                  elevation: 4,
                 ),
                 child: Text(
                   'Search',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            if (_isLoading)
-              Center(child: CircularProgressIndicator())
-            else if (_geneResults.isNotEmpty)
-              Expanded(
-                child: SingleChildScrollView(
+              SizedBox(height: 20),
+              if (_isLoading)
+                Center(child: CircularProgressIndicator())
+              else if (_geneResults.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Table(
                     border: TableBorder.all(
-                      color: Colors.blueGrey,
+                      color: Colors.blueGrey[200]!,
                       width: 1,
-                      borderRadius: BorderRadius.circular(5),
                     ),
                     columnWidths: {
                       0: FlexColumnWidth(1),
@@ -131,9 +146,7 @@ class _AllGenesSearchPageState extends State<AllGenesSearchPage> {
                     },
                     children: [
                       TableRow(
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey[50],
-                        ),
+                        decoration: BoxDecoration(color: Colors.blueGrey[50]),
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -187,7 +200,7 @@ class _AllGenesSearchPageState extends State<AllGenesSearchPage> {
                         return TableRow(
                           decoration: BoxDecoration(
                             color: index % 2 == 0
-                                ? Colors.blueGrey[100]
+                                ? Colors.blueGrey[50]
                                 : Colors.white,
                           ),
                           children: [
@@ -236,16 +249,20 @@ class _AllGenesSearchPageState extends State<AllGenesSearchPage> {
                       }).toList(),
                     ],
                   ),
+                )
+              else
+                Center(
+                  child: Text(
+                    'No results found. Please try searching for another gene.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.blueGrey[700],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              )
-            else
-              Center(
-                child: Text(
-                  'No results found. Please try searching for another gene.',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

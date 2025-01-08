@@ -14,12 +14,12 @@ class SavedPharmGKBReferencesPage extends StatelessWidget {
           'Saved PharmGKB References',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.white, // Ensures the header text color is white
+            color: Colors.white,
           ),
         ),
         backgroundColor: Colors.blue[800],
         centerTitle: true,
-        iconTheme: IconThemeData(color: Colors.white), // Ensures the back arrow color is white
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -62,12 +62,16 @@ class SavedPharmGKBReferencesPage extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            reference['referenceName'] ?? 'Unknown Reference',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.blueGrey[800],
+                          Expanded(
+                            child: Text(
+                              reference['referenceName'] ?? 'Unknown Reference',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.blueGrey[800],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           IconButton(
@@ -139,6 +143,8 @@ class SavedPharmGKBReferencesPage extends StatelessWidget {
                             color: Colors.blue,
                             decoration: TextDecoration.underline,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -164,19 +170,13 @@ class WebViewPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Reference',
-          style: TextStyle(color: Colors.white), // Ensures the header text color is white
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue[400],
-        iconTheme: IconThemeData(color: Colors.white), // Ensures the back arrow color is white
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: InAppWebView(
-        initialUrlRequest: URLRequest(url: WebUri(url)),
-        onLoadStart: (controller, url) {
-          // Optional: Show loading indicator
-        },
-        onLoadStop: (controller, url) {
-          // Optional: Hide loading indicator
-        },
+        initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(url))),
       ),
     );
   }

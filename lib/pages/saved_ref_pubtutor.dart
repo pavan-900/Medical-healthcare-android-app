@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:intl/intl.dart';
 
 class SavedPubTutorReferencesPage extends StatelessWidget {
   @override
@@ -18,7 +19,7 @@ class SavedPubTutorReferencesPage extends StatelessWidget {
           ),
         ),
         backgroundColor: Colors.blue[400],
-        iconTheme: IconThemeData(color: Colors.white), // Ensures the back arrow is white
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -45,66 +46,82 @@ class SavedPubTutorReferencesPage extends StatelessWidget {
             itemCount: savedReferences.length,
             itemBuilder: (context, index) {
               final reference = savedReferences[index];
-              final otherConditions = List<String>.from(
-                  reference['otherConditions'] ?? []);
+              final otherConditions = List<String>.from(reference['otherConditions'] ?? []);
+              final String? rawDate = reference['date'];
+              String formattedDate = 'Unknown Date';
+
+              // Format the date if available
+              if (rawDate != null && rawDate.isNotEmpty) {
+                try {
+                  final DateTime date = DateTime.parse(rawDate);
+                  formattedDate = DateFormat('d MMMM, yyyy').format(date); // Example: 13 June, 2024
+                } catch (e) {
+                  formattedDate = 'Invalid Date';
+                }
+              }
 
               return Card(
-                elevation: 6,
-                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                elevation: 4,
+                margin: EdgeInsets.symmetric(vertical: 6, horizontal: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // PMID, PMCID, and Date
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'PMID: ${reference['pmid'] ?? 'N/A'} . ${reference['pmcid'] ?? 'N/A'}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          Text(
+                            formattedDate,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 6),
+                      // Title
                       Text(
                         reference['title'] ?? 'No Title',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
+                          color: Colors.black,
                         ),
                       ),
-                      SizedBox(height: 8),
-                      Text('Gene: ${reference['geneName']}'),
-                      Text('Condition: ${reference['currentCondition']}'),
-                      SizedBox(height: 8),
-                      Text('Journal: ${reference['journal'] ?? 'No Journal'}',
-                          style: TextStyle(
-                              fontStyle: FontStyle.italic, fontSize: 14)),
-                      SizedBox(height: 8),
-                      Text('Authors: ${reference['authors'] ?? 'No Authors'}',
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.grey[700])),
-                      SizedBox(height: 8),
+                      SizedBox(height: 6),
+                      // Journal
                       Text(
-                        'Publication Date: ${reference['date'] ?? 'Unknown Date'}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                      SizedBox(height: 8),
-                      Text('PMID: ${reference['pmid'] ?? 'No PMID'}'),
-                      Text('PMCID: ${reference['pmcid'] ?? 'No PMCID'}'),
-                      SizedBox(height: 8),
-                      if (otherConditions.isNotEmpty) ...[
-                        Text(
-                          'Other Conditions:',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14),
+                        'Journal: ${reference['journal'] ?? 'No Journal'}',
+                        style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontSize: 14,
+                          color: Colors.blueGrey[800],
                         ),
-                        SizedBox(height: 5),
-                        ...otherConditions.map((condition) => Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            '- $condition',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.blueGrey[600],
-                            ),
-                          ),
-                        )),
-                      ],
-                      SizedBox(height: 8),
+                      ),
+                      SizedBox(height: 6),
+                      // Authors
+                      Text(
+                        'Authors: ${reference['authors'] ?? 'No Authors'}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      // Link
                       GestureDetector(
                         onTap: () {
                           final url = reference['link'];
@@ -130,11 +147,53 @@ class SavedPubTutorReferencesPage extends StatelessWidget {
                           ),
                         ),
                       ),
+                      SizedBox(height: 8),
+                      Divider(color: Colors.grey[300]),
+                      SizedBox(height: 8),
+                      // Additional Info (Gene Name, Condition, and Other Conditions)
+                      Text(
+                        'Gene: ${reference['geneName'] ?? 'N/A'}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        'Condition: ${reference['currentCondition'] ?? 'N/A'}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      if (otherConditions.isNotEmpty) ...[
+                        SizedBox(height: 6),
+                        Text(
+                          'Other Conditions:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.black,
+                          ),
+                        ),
+                        ...otherConditions.map((condition) => Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            '- $condition',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blueGrey[800],
+                            ),
+                          ),
+                        )),
+                      ],
                       SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
+                      // Delete Button
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Transform.translate(
+                          offset: Offset(0, -6), // Move the delete icon upwards
+                          child: IconButton(
                             icon: Icon(Icons.delete, color: Colors.red),
                             onPressed: () async {
                               try {
@@ -149,7 +208,7 @@ class SavedPubTutorReferencesPage extends StatelessWidget {
                               }
                             },
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
@@ -174,10 +233,10 @@ class WebViewPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Reference',
-          style: TextStyle(color: Colors.white), // Ensures the header text color is white
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue[400],
-        iconTheme: IconThemeData(color: Colors.white), // Ensures the back arrow color is white
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: InAppWebView(
         initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(url))),

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'find_disease_page.dart';
+import 'find_condition_page.dart';
 import 'saved_genes_page.dart';
 import 'search_page.dart';
 import '../Drawer/home.dart';
@@ -13,6 +13,7 @@ import '../Drawer/help.dart';
 import '../Drawer/terms.dart';
 import 'saved_ref_pharm.dart';
 import 'saved_ref_pubtutor.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -26,21 +27,16 @@ class _HomePageState extends State<HomePage> {
     {'title': 'Find the gene', 'icon': Icons.search, 'page': AllGenesSearchPage()},
     {'title': 'Profile', 'icon': Icons.person, 'page': ProfilePage()},
     {'title': 'Saved Genes', 'icon': Icons.save, 'page': SavedGenesPage()},
-    {'title': 'Saved  pharmGKB', 'icon': Icons.save, 'page': SavedPharmGKBReferencesPage()},
-    {'title': 'Saved pubtutor', 'icon': Icons.save, 'page': SavedPubTutorReferencesPage()},
-    {'title': 'Terms', 'icon': Icons.description, 'page':  terms()},
+    {'title': 'Saved PharmGKB', 'icon': Icons.save, 'page': SavedPharmGKBReferencesPage()},
+    {'title': 'Saved PubTutor', 'icon': Icons.save, 'page': SavedPubTutorReferencesPage()},
+    {'title': 'Terms', 'icon': Icons.description, 'page': terms()},
     {'title': 'Feedback', 'icon': Icons.feedback, 'page': feedback()},
     {'title': 'Help', 'icon': Icons.help, 'page': help()},
     {'title': 'Settings', 'icon': Icons.settings, 'page': settings()},
-
     {'title': 'About', 'icon': Icons.info, 'page': About()},
   ];
 
-
-
-
-  final List<Map<String, dynamic>> diseaseData = [
-    //{'name': 'Search Gene', 'image': 'assets/images/anxietyy.png','genes':500},
+  final List<Map<String, dynamic>> conditionData = [
     {'name': 'Anxiety', 'image': 'assets/images/anxietyy.png', 'genes': 100},
     {'name': 'Diabetes', 'image': 'assets/images/diabetes.jpg', 'genes': 200},
     {'name': 'CAD', 'image': 'assets/images/cardiac.png', 'genes': 150},
@@ -48,8 +44,8 @@ class _HomePageState extends State<HomePage> {
     {'name': 'Obesity', 'image': 'assets/images/obesity.png', 'genes': 100},
     {'name': 'Cancer', 'image': 'assets/images/cancer.webp', 'genes': 50},
     {'name': 'Depression', 'image': 'assets/images/Depression.png', 'genes': 120},
-    {'name': 'Cholestral', 'image': 'assets/images/cholestral.webp', 'genes': 300},
-    {'name': 'Diabetes_mellitus', 'image': 'assets/images/diabetes-milleus.png', 'genes': 250},
+    {'name': 'Cholesterol', 'image': 'assets/images/cholestral.webp', 'genes': 300},
+    {'name': 'Diabetes Mellitus', 'image': 'assets/images/diabetes-milleus.png', 'genes': 250},
   ];
 
   final int totalGenes = 500;
@@ -158,7 +154,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: Icon(Icons.search, color: Colors.white),
             onPressed: () {
-              showSearch(context: context, delegate: DiseaseSearchDelegate(diseaseData));
+              showSearch(context: context, delegate: ConditionSearchDelegate(conditionData));
             },
           ),
         ],
@@ -220,17 +216,17 @@ class _HomePageState extends State<HomePage> {
             mainAxisSpacing: 15,
             childAspectRatio: 0.8,
           ),
-          itemCount: diseaseData.length,
+          itemCount: conditionData.length,
           itemBuilder: (context, index) {
-            final disease = diseaseData[index];
-            final progress = disease['genes'] / totalGenes;
+            final condition = conditionData[index];
+            final progress = condition['genes'] / totalGenes;
 
             return GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SearchPage(diseaseName: disease['name']),
+                    builder: (context) => SearchPage(conditionName: condition['name']),
                   ),
                 );
               },
@@ -246,7 +242,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     ClipOval(
                       child: Image.asset(
-                        disease['image'],
+                        condition['image'],
                         height: 80,
                         width: 80,
                         fit: BoxFit.cover,
@@ -254,7 +250,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      disease['name'],
+                      condition['name'],
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -282,7 +278,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      '${disease['genes']} of $totalGenes Genes',
+                      '${condition['genes']} of $totalGenes Genes',
                       style: TextStyle(fontSize: 14, color: Colors.blueGrey[600]),
                     ),
                   ],
@@ -296,10 +292,10 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class DiseaseSearchDelegate extends SearchDelegate<String> {
-  final List<Map<String, dynamic>> diseaseData;
+class ConditionSearchDelegate extends SearchDelegate<String> {
+  final List<Map<String, dynamic>> conditionData;
 
-  DiseaseSearchDelegate(this.diseaseData);
+  ConditionSearchDelegate(this.conditionData);
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -325,22 +321,22 @@ class DiseaseSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    final List<Map<String, dynamic>> results = diseaseData
-        .where((disease) => disease['name'].toLowerCase().contains(query.toLowerCase()))
+    final List<Map<String, dynamic>> results = conditionData
+        .where((condition) => condition['name'].toLowerCase().contains(query.toLowerCase()))
         .toList();
 
     return ListView.builder(
       itemCount: results.length,
       itemBuilder: (context, index) {
-        final disease = results[index];
+        final condition = results[index];
         return ListTile(
-          title: Text(disease['name']),
-          leading: Image.asset(disease['image'], height: 50, width: 50),
+          title: Text(condition['name']),
+          leading: Image.asset(condition['image'], height: 50, width: 50),
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SearchPage(diseaseName: disease['name']),
+                builder: (context) => SearchPage(conditionName: condition['name']),
               ),
             );
           },
@@ -351,19 +347,19 @@ class DiseaseSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    final List<Map<String, dynamic>> suggestions = diseaseData
-        .where((disease) => disease['name'].toLowerCase().contains(query.toLowerCase()))
+    final List<Map<String, dynamic>> suggestions = conditionData
+        .where((condition) => condition['name'].toLowerCase().contains(query.toLowerCase()))
         .toList();
 
     return ListView.builder(
       itemCount: suggestions.length,
       itemBuilder: (context, index) {
-        final disease = suggestions[index];
+        final condition = suggestions[index];
         return ListTile(
-          title: Text(disease['name']),
-          leading: Image.asset(disease['image'], height: 50, width: 50),
+          title: Text(condition['name']),
+          leading: Image.asset(condition['image'], height: 50, width: 50),
           onTap: () {
-            query = disease['name'];
+            query = condition['name'];
             showResults(context);
           },
         );

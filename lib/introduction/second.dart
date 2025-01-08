@@ -1,7 +1,101 @@
 import 'package:flutter/material.dart';
 import '../introduction/third_page.dart'; // Import ThirdPage
-import '../pages/home_page.dart';
-class AirdropPage extends StatelessWidget {
+import 'signupPromptPage.dart';
+
+class AirdropPage extends StatefulWidget {
+  @override
+  _AirdropPageState createState() => _AirdropPageState();
+}
+
+class _AirdropPageState extends State<AirdropPage> with TickerProviderStateMixin {
+  late AnimationController _imageController;
+  late AnimationController _textController;
+
+  late Animation<Offset> _imageSlideAnimation;
+  late Animation<Offset> _textSlideAnimation;
+
+  late Animation<double> _imageFadeAnimation;
+  late Animation<double> _textFadeAnimation;
+
+  late Animation<double> _imageScaleAnimation;
+  late Animation<double> _textScaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize animation controllers
+    _imageController = AnimationController(
+      duration: Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    _textController = AnimationController(
+      duration: Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    // Image animations
+    _imageSlideAnimation = Tween<Offset>(
+      begin: Offset(0, 1), // Start from below
+      end: Offset.zero, // End at its original position
+    ).animate(CurvedAnimation(
+      parent: _imageController,
+      curve: Curves.easeOut,
+    ));
+
+    _imageFadeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _imageController,
+      curve: Curves.easeIn,
+    ));
+
+    _imageScaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _imageController,
+      curve: Curves.elasticOut,
+    ));
+
+    // Text animations
+    _textSlideAnimation = Tween<Offset>(
+      begin: Offset(0, 0.5), // Start slightly below
+      end: Offset.zero, // End at its original position
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: Curves.easeOut,
+    ));
+
+    _textFadeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: Curves.easeIn,
+    ));
+
+    _textScaleAnimation = Tween<double>(
+      begin: 0.9,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Start animations sequentially
+    _imageController.forward().then((_) => _textController.forward());
+  }
+
+  @override
+  void dispose() {
+    _imageController.dispose();
+    _textController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +114,7 @@ class AirdropPage extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomePage()), // Skip to ThirdPage
+                MaterialPageRoute(builder: (context) => SignupPromptPage()), // Skip to SignupPromptPage
               );
             },
             child: Text(
@@ -32,17 +126,33 @@ class AirdropPage extends StatelessWidget {
       ),
       body: Column(
         children: [
+          // Animated Image Section
           Expanded(
             flex: 3, // Larger image area
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Image.asset(
-                'assets/images/airdrop2.jpg', // Replace with your image
-                height: MediaQuery.of(context).size.height * 0.6, // Set height to 60% of screen
-                fit: BoxFit.contain,
+              child: AnimatedBuilder(
+                animation: _imageController,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _imageScaleAnimation.value,
+                    child: SlideTransition(
+                      position: _imageSlideAnimation,
+                      child: FadeTransition(
+                        opacity: _imageFadeAnimation,
+                        child: Image.asset(
+                          'assets/images/airdrop2.jpg', // Replace with your image
+                          height: MediaQuery.of(context).size.height * 0.6, // Set height to 60% of screen
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
+          // Animated Text Section
           Expanded(
             flex: 1,
             child: Padding(
@@ -50,28 +160,57 @@ class AirdropPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Gene Scores", // Placeholder title
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                  AnimatedBuilder(
+                    animation: _textController,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _textScaleAnimation.value,
+                        child: SlideTransition(
+                          position: _textSlideAnimation,
+                          child: FadeTransition(
+                            opacity: _textFadeAnimation,
+                            child: Text(
+                              "Gene Scores",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(height: 10),
-                  Text(
-                    " Analyze gene scores for different diseases to understand the genetic factors at play.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[700],
-                    ),
+                  AnimatedBuilder(
+                    animation: _textController,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _textScaleAnimation.value,
+                        child: SlideTransition(
+                          position: _textSlideAnimation,
+                          child: FadeTransition(
+                            opacity: _textFadeAnimation,
+                            child: Text(
+                              "Analyze gene scores for different conditions to understand the genetic factors at play.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
             ),
           ),
+          // Navigation Buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
             child: Row(
@@ -94,12 +233,12 @@ class AirdropPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        transitionDuration: Duration(milliseconds: 500), // Smooth slow animation
+                        transitionDuration: Duration(milliseconds: 700), // Smooth animation
                         pageBuilder: (_, __, ___) => ThirdPage(), // Navigate to ThirdPage
                         transitionsBuilder: (_, animation, __, child) {
                           return SlideTransition(
                             position: Tween<Offset>(
-                              begin: Offset(-1, 0), // Start from right
+                              begin: Offset(1, 0), // Start from the right
                               end: Offset(0, 0), // End at the center
                             ).animate(animation),
                             child: child,

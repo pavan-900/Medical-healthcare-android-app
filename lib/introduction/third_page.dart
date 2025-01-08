@@ -1,18 +1,92 @@
 import 'package:flutter/material.dart';
 import '../introduction/SignupPromptPage.dart'; // Update path for SignupPromptPage
-import '../pages/home_page.dart'; // Update path for HomePage if necessary
-class ThirdPage extends StatelessWidget {
+
+class ThirdPage extends StatefulWidget {
+  @override
+  _ThirdPageState createState() => _ThirdPageState();
+}
+
+class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin {
+  late AnimationController _imageController;
+  late AnimationController _textController;
+
+  late Animation<Offset> _imageSlideAnimation;
+  late Animation<Offset> _textSlideAnimation;
+
+  late Animation<double> _imageFadeAnimation;
+  late Animation<double> _textFadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize animation controllers
+    _imageController = AnimationController(
+      duration: Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    _textController = AnimationController(
+      duration: Duration(milliseconds: 1000),
+      vsync: this,
+    );
+
+    // Image animations
+    _imageSlideAnimation = Tween<Offset>(
+      begin: Offset(0, 1), // Start from bottom
+      end: Offset.zero, // End at its original position
+    ).animate(CurvedAnimation(
+      parent: _imageController,
+      curve: Curves.easeOut,
+    ));
+
+    _imageFadeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _imageController,
+      curve: Curves.easeIn,
+    ));
+
+    // Text animations
+    _textSlideAnimation = Tween<Offset>(
+      begin: Offset(0, 0.5), // Start slightly below
+      end: Offset.zero, // End at its original position
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: Curves.easeOut,
+    ));
+
+    _textFadeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: Curves.easeIn,
+    ));
+
+    // Start animations sequentially
+    _imageController.forward().then((_) => _textController.forward());
+  }
+
+  @override
+  void dispose() {
+    _imageController.dispose();
+    _textController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Set background to white
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context); // Go back to the previous page
+            Navigator.pop(context);
           },
         ),
         actions: [
@@ -20,7 +94,7 @@ class ThirdPage extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomePage()), // Skip to HomePage
+                MaterialPageRoute(builder: (context) => SignupPromptPage()),
               );
             },
             child: Text(
@@ -32,17 +106,30 @@ class ThirdPage extends StatelessWidget {
       ),
       body: Column(
         children: [
+          // Animated Image Section
           Expanded(
             flex: 2,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Image.asset(
-                'assets/images/third.jpg', // Replace with your image
-                fit: BoxFit.contain,
-                height: MediaQuery.of(context).size.height * 0.5, // Large image size
+              child: AnimatedBuilder(
+                animation: _imageController,
+                builder: (context, child) {
+                  return SlideTransition(
+                    position: _imageSlideAnimation,
+                    child: FadeTransition(
+                      opacity: _imageFadeAnimation,
+                      child: Image.asset(
+                        'assets/images/third.jpg', // Replace with your image
+                        fit: BoxFit.contain,
+                        height: MediaQuery.of(context).size.height * 0.5,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
+          // Animated Text Section
           Expanded(
             flex: 1,
             child: Padding(
@@ -50,40 +137,64 @@ class ThirdPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Gene Search",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                  AnimatedBuilder(
+                    animation: _textController,
+                    builder: (context, child) {
+                      return SlideTransition(
+                        position: _textSlideAnimation,
+                        child: FadeTransition(
+                          opacity: _textFadeAnimation,
+                          child: Text(
+                            "Gene Search",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(height: 10),
-                  Text(
-                    " Find detailed information about specific genes linked to a disease.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[700],
-                    ),
+                  AnimatedBuilder(
+                    animation: _textController,
+                    builder: (context, child) {
+                      return SlideTransition(
+                        position: _textSlideAnimation,
+                        child: FadeTransition(
+                          opacity: _textFadeAnimation,
+                          child: Text(
+                            "Find detailed information about specific genes linked to a condition.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
             ),
           ),
+          // Navigation Buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Progress Indicators
                 Row(
                   children: [
                     CircleAvatar(radius: 5, backgroundColor: Colors.grey[300]),
                     SizedBox(width: 5),
                     CircleAvatar(radius: 5, backgroundColor: Colors.grey[300]),
                     SizedBox(width: 5),
-                    CircleAvatar(radius: 5, backgroundColor: Colors.black),
+                    CircleAvatar(radius: 5, backgroundColor: Colors.black), // Current page
                     SizedBox(width: 5),
                     CircleAvatar(radius: 5, backgroundColor: Colors.grey[300]),
                   ],
@@ -93,13 +204,13 @@ class ThirdPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        transitionDuration: Duration(milliseconds: 500), // Slower animation (1 second)
-                        pageBuilder: (_, __, ___) => SignupPromptPage(), // Navigate to SignupPromptPage
+                        transitionDuration: Duration(milliseconds: 700),
+                        pageBuilder: (_, __, ___) => SignupPromptPage(),
                         transitionsBuilder: (_, animation, __, child) {
                           return SlideTransition(
                             position: Tween<Offset>(
-                              begin: Offset(-1, 0), // Slide from left to right
-                              end: Offset(0, 0), // End at the center
+                              begin: Offset(1, 0),
+                              end: Offset(0, 0),
                             ).animate(animation),
                             child: child,
                           );

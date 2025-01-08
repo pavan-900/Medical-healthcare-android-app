@@ -18,20 +18,20 @@ class SignupPromptPage extends StatelessWidget {
             Navigator.pop(context); // Go back to the previous page
           },
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()), // Skip to HomePage
-              );
-            },
-            child: Text(
-              "Skip",
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
+        // actions: [
+        //   TextButton(
+        //     onPressed: () {
+        //       Navigator.pushReplacement(
+        //         context,
+        //         MaterialPageRoute(builder: (context) => HomePage()), // Skip to HomePage
+        //       );
+        //     },
+        //     child: Text(
+        //       "Skip",
+        //       style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        //     ),
+        //   ),
+        // ],
       ),
       body: Column(
         children: [
@@ -64,7 +64,7 @@ class SignupPromptPage extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "Visualize gene data with pie charts for a better understanding of gene distributions in specific diseases.",
+                    "Visualize gene data with pie charts for a better understanding.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,

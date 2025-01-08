@@ -8,9 +8,9 @@ import '../models/gene.dart';
 import 'references_selection_page.dart';
 
 class SearchPage extends StatefulWidget {
-  final String diseaseName;
+  final String conditionName;
 
-  SearchPage({required this.diseaseName});
+  SearchPage({required this.conditionName});
 
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -43,7 +43,7 @@ class _SearchPageState extends State<SearchPage> {
         .collection('saved_genes')
         .where('userId', isEqualTo: userId)
         .where('geneName', isEqualTo: geneName)
-        .where('currentCondition', isEqualTo: widget.diseaseName)
+        .where('currentCondition', isEqualTo: widget.conditionName)
         .get();
 
     setState(() {
@@ -54,7 +54,7 @@ class _SearchPageState extends State<SearchPage> {
   Future<void> _searchGene() async {
     String enteredGene = geneController.text.trim();
     if (enteredGene.isNotEmpty) {
-      final geneData = await geneService.fetchGeneAndCheckOtherDiseases(widget.diseaseName, enteredGene);
+      final geneData = await geneService.fetchGeneAndCheckOtherConditions(widget.conditionName, enteredGene);
 
       final currentConditionGenes = geneData['currentCondition'];
       final fetchedOtherConditionGenes = geneData['otherConditions'];
@@ -78,7 +78,7 @@ class _SearchPageState extends State<SearchPage> {
         _checkIfGeneIsSaved();
       } else {
         setState(() {
-          geneName = "No results found in ${widget.diseaseName}.";
+          geneName = "No results found in ${widget.conditionName}.";
           geneScore = null;
           showResult = true;
           otherConditionGenes = [];
@@ -102,7 +102,7 @@ class _SearchPageState extends State<SearchPage> {
         await FirebaseFirestore.instance.collection('saved_genes').add({
           'geneName': geneName,
           'geneScore': geneScore,
-          'currentCondition': widget.diseaseName,
+          'currentCondition': widget.conditionName,
           'otherConditions': otherConditionGenes
               .map((gene) => {
             'condition': gene.condition,
@@ -139,7 +139,7 @@ class _SearchPageState extends State<SearchPage> {
         .collection('saved_genes')
         .where('userId', isEqualTo: userId)
         .where('geneName', isEqualTo: geneName)
-        .where('currentCondition', isEqualTo: widget.diseaseName)
+        .where('currentCondition', isEqualTo: widget.conditionName)
         .get();
 
     for (var doc in query.docs) {
@@ -203,7 +203,7 @@ class _SearchPageState extends State<SearchPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          'Search Gene in ${widget.diseaseName}',
+          'Search Gene in ${widget.conditionName}',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
@@ -312,7 +312,7 @@ class _SearchPageState extends State<SearchPage> {
                               builder: (context) => ReferencesSelectionPage(
                                 geneSymbol: geneName!,
                                 pharmGKBId: pharmGKBId ?? '',
-                                currentCondition: widget.diseaseName,
+                                currentCondition: widget.conditionName,
                                 otherConditions: otherConditionGenes.map((gene) => {
                                   'condition': gene.condition,
                                   'score': gene.geneScore,
@@ -343,7 +343,7 @@ class _SearchPageState extends State<SearchPage> {
                 if (otherConditionGenes.isNotEmpty) ...[
                   SizedBox(height: 30),
                   Text(
-                    'Also Found in Other Diseases:',
+                    'Also Found in Other Conditions:',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -392,7 +392,7 @@ class _SearchPageState extends State<SearchPage> {
                                 },
                               ),
                               axisNameWidget: Text(
-                                'Diseases',
+                                'Conditions',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
