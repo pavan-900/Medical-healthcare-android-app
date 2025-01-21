@@ -13,6 +13,7 @@ import '../Drawer/help.dart';
 import '../Drawer/terms.dart';
 import 'saved_ref_pharm.dart';
 import 'saved_ref_pubtutor.dart';
+import 'disease_insight.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -24,28 +25,32 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<AnimatedListState> _animatedListKey = GlobalKey<AnimatedListState>();
 
   final List<Map<String, dynamic>> drawerItems = [
-    {'title': 'Find the gene', 'icon': Icons.search, 'page': AllGenesSearchPage()},
-    {'title': 'Profile', 'icon': Icons.person, 'page': ProfilePage()},
+    {'title': 'Find the gene', 'icon': Icons.biotech, 'page': AllGenesSearchPage()},
+    {'title': 'Disease Insight', 'icon': Icons.healing, 'page':  DiseaseSearchPage()},
+
     {'title': 'Saved Genes', 'icon': Icons.save, 'page': SavedGenesPage()},
     {'title': 'Saved PharmGKB', 'icon': Icons.save, 'page': SavedPharmGKBReferencesPage()},
     {'title': 'Saved PubTutor', 'icon': Icons.save, 'page': SavedPubTutorReferencesPage()},
-    {'title': 'Terms', 'icon': Icons.description, 'page': terms()},
-    {'title': 'Feedback', 'icon': Icons.feedback, 'page': feedback()},
+    {'title': 'Profile', 'icon': Icons.person, 'page': ProfilePage()},
+
+    {'title': 'Terms', 'icon': Icons.description, 'page': MyApp()},
+    {'title': 'Feedback', 'icon': Icons.feedback, 'page':  feedback()},
     {'title': 'Help', 'icon': Icons.help, 'page': help()},
     {'title': 'Settings', 'icon': Icons.settings, 'page': settings()},
     {'title': 'About', 'icon': Icons.info, 'page': About()},
   ];
 
   final List<Map<String, dynamic>> conditionData = [
-    {'name': 'Anxiety', 'image': 'assets/images/anxietyy.png', 'genes': 100},
-    {'name': 'Diabetes', 'image': 'assets/images/diabetes.jpg', 'genes': 200},
+    {'name': 'Anxiety', 'image': 'assets/images/anxietyy.png', 'genes': 300},
     {'name': 'CAD', 'image': 'assets/images/cardiac.png', 'genes': 150},
-    {'name': 'Liver', 'image': 'assets/images/liver2.jpg', 'genes': 490},
-    {'name': 'Obesity', 'image': 'assets/images/obesity.png', 'genes': 100},
-    {'name': 'Cancer', 'image': 'assets/images/cancer.webp', 'genes': 50},
+    {'name': 'Obesity', 'image': 'assets/images/obesity.png', 'genes': 300},
     {'name': 'Depression', 'image': 'assets/images/Depression.png', 'genes': 120},
     {'name': 'Cholesterol', 'image': 'assets/images/cholestral.webp', 'genes': 300},
-    {'name': 'Diabetes Mellitus', 'image': 'assets/images/diabetes-milleus.png', 'genes': 250},
+    {'name': 'Diabetes_mellitus', 'image': 'assets/images/diabetes-milleus.png', 'genes': 250},
+    {'name': 'Diabetes', 'image': 'assets/images/diabetes.jpg', 'genes': 200},
+    {'name': 'Liver', 'image': 'assets/images/liver2.jpg', 'genes': 490},
+    {'name': 'Artial Fabrillation', 'image': 'assets/images/artial.jpg', 'genes': 250},
+    {'name': 'Cardiomyopthy', 'image': 'assets/images/cardiomyopathy.jpg', 'genes': 300},
   ];
 
   final int totalGenes = 500;

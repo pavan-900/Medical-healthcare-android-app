@@ -200,24 +200,24 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin {
                   ],
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        transitionDuration: Duration(milliseconds: 700),
-                        pageBuilder: (_, __, ___) => SignupPromptPage(),
-                        transitionsBuilder: (_, animation, __, child) {
-                          return SlideTransition(
-                            position: Tween<Offset>(
-                              begin: Offset(1, 0),
-                              end: Offset(0, 0),
-                            ).animate(animation),
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
-                  },
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          transitionDuration: Duration(milliseconds: 700), // Smooth animation
+                          pageBuilder: (_, __, ___) => SignupPromptPage(), // Navigate to ThirdPage
+                          transitionsBuilder: (_, animation, __, child) {
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: Offset(-1, 0), // Start from the right
+                                end: Offset(0, 0), // End at the center
+                              ).animate(animation),
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
                   style: ElevatedButton.styleFrom(
                     shape: CircleBorder(),
                     padding: EdgeInsets.all(15),

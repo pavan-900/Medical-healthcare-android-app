@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decomposition Tree</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        svg {
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<svg width="600" height="400"></svg>
+<script>
+    var data = {
+        name: "Root",
+        children: [
+            {
+                name: "Child 1",
+                children: [
+                    { name: "Child 1.1" },
+                    { name: "Child 1.2" }
+                ]
+            },
+            {
+                name: "Child 2",
+                children: [
+                    { name: "Child 2.1" },
+                    { name: "Child 2.2" }
+                ]
+            }
+        ]
+    };
+
+    var svg = d3.select("svg");
+    var root = d3.hierarchy(data);
+    var treeLayout = d3.tree().size([600, 400]);
+    treeLayout(root);
+
+    svg.selectAll("line")
+        .data(root.links())
+        .enter()
+        .append("line")
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y)
+        .attr("stroke", "#aaa");
+
+    svg.selectAll("circle")
+        .data(root.descendants())
+        .enter()
+        .append("circle")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", 5)
+        .attr("fill", "#69b3a2");
+
+    svg.selectAll("text")
+        .data(root.descendants())
+        .enter()
+        .append("text")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y - 10)
+        .attr("text-anchor", "middle")
+        .text(d => d.data.name);
+</script>
+</body>
+</html>

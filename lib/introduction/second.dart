@@ -238,7 +238,7 @@ class _AirdropPageState extends State<AirdropPage> with TickerProviderStateMixin
                         transitionsBuilder: (_, animation, __, child) {
                           return SlideTransition(
                             position: Tween<Offset>(
-                              begin: Offset(1, 0), // Start from the right
+                              begin: Offset(-1, 0), // Start from the right
                               end: Offset(0, 0), // End at the center
                             ).animate(animation),
                             child: child,

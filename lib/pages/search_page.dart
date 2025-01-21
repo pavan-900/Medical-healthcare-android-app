@@ -6,6 +6,8 @@ import '../services/gene_service.dart';
 import '../services/gene_api_service.dart';
 import '../models/gene.dart';
 import 'references_selection_page.dart';
+import 'associated_diseases.dart';
+import 'causing_disease.dart';
 
 class SearchPage extends StatefulWidget {
   final String conditionName;
@@ -20,18 +22,99 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController geneController = TextEditingController();
   final GeneService geneService = GeneService();
   final GeneAPIService geneAPIService = GeneAPIService();
+
   String? geneName;
   int? geneScore;
   bool showResult = false;
+  bool isFetchingGene = false;
   String? pharmGKBId;
   List<Gene> otherConditionGenes = [];
-  bool isSaved = false; // Track saved status
+  bool isSaved = false;
+  bool showDefaultGenes = true;
+
+  final Map<String, List<Map<String, dynamic>>> defaultGenes = {
+    // Add your conditions and genes here
+    'Anxiety': [
+      {'name': 'TCF12', 'score': 1},
+      {'name': 'ATM', 'score': 3},
+      {'name': 'DUSP6', 'score': 2},
+      {'name': 'IFNG', 'score': 4},
+      {'name': 'NIPBL', 'score': 1},
+    ],
+    'Diabetes': [
+      {'name': 'GeneA', 'score': 95},
+      {'name': 'GeneB', 'score': 89},
+      {'name': 'GeneC', 'score': 92},
+      {'name': 'GeneD', 'score': 88},
+      {'name': 'GeneE', 'score': 90},
+    ],
+    'CAD': [
+      {'name': 'ITGB3', 'score': 4},
+      {'name': 'ABCA1', 'score': 9},
+      {'name': 'TGFB3', 'score': 4},
+      {'name': 'MRAP', 'score': 5},
+      {'name': 'HLA-DRB1', 'score': 8},
+    ],
+    'Obesity': [
+      {'name': 'DHX38', 'score': 1},
+      {'name': 'ANOS1', 'score': 1},
+      {'name': 'H6PD', 'score': 1},
+      {'name': 'GSYNE1', 'score': 1},
+      {'name': 'SLC10A7', 'score': 1},
+    ],
+    'Depression': [
+      {'name': 'HFE', 'score': 2},
+      {'name': 'ATXN8OS', 'score': 1},
+      {'name': 'TREM2', 'score': 3},
+      {'name': 'MST1', 'score': 1},
+      {'name': 'CTSD', 'score': 2},
+    ],
+    'Cholesterol': [
+      {'name': 'ALB', 'score': 6},
+      {'name': 'PEX12', 'score': 6},
+      {'name': 'FDFT1', 'score': 1},
+      {'name': 'APOB', 'score': 8},
+      {'name': 'MTTP', 'score': 9},
+    ],
+
+
+    'Diabetes_mellitus': [
+      {'name': 'GCGR"', 'score': 6},
+      {'name': 'GBE1', 'score': 5},
+      {'name': 'NOP10', 'score': 2},
+      {'name': 'TMEM270', 'score': 2},
+      {'name': 'CLCNKB', 'score': 2},
+    ],
+    'Artial Fabrillation': [
+      {'name': 'Gene1', 'score': 80},
+      {'name': 'Gene2', 'score': 90},
+      {'name': 'Gene3', 'score': 85},
+      {'name': 'Gene4', 'score': 75},
+      {'name': 'Gene5', 'score': 88},
+    ],
+    'Cardiomyopthy': [
+      {'name': 'Gene1', 'score': 80},
+      {'name': 'Gene2', 'score': 90},
+      {'name': 'Gene3', 'score': 85},
+      {'name': 'Gene4', 'score': 75},
+      {'name': 'Gene5', 'score': 88},
+    ],
+    'Liver': [
+      {'name': 'Gene1', 'score': 80},
+      {'name': 'Gene2', 'score': 90},
+      {'name': 'Gene3', 'score': 85},
+      {'name': 'Gene4', 'score': 75},
+      {'name': 'Gene5', 'score': 88},
+    ],
+  };
 
   @override
   void initState() {
     super.initState();
     geneController.addListener(() {
-      setState(() {}); // Update UI whenever input changes
+      setState(() {
+        showDefaultGenes = geneController.text.trim().isEmpty;
+      });
     });
   }
 
@@ -49,42 +132,6 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       isSaved = query.docs.isNotEmpty;
     });
-  }
-
-  Future<void> _searchGene() async {
-    String enteredGene = geneController.text.trim();
-    if (enteredGene.isNotEmpty) {
-      final geneData = await geneService.fetchGeneAndCheckOtherConditions(widget.conditionName, enteredGene);
-
-      final currentConditionGenes = geneData['currentCondition'];
-      final fetchedOtherConditionGenes = geneData['otherConditions'];
-
-      if (currentConditionGenes.isNotEmpty) {
-        setState(() {
-          geneName = currentConditionGenes.first.geneName;
-          geneScore = currentConditionGenes.first.geneScore;
-          showResult = true;
-          otherConditionGenes = fetchedOtherConditionGenes;
-        });
-
-        // Fetch PharmGKB ID
-        final fetchedPharmGKBId = await geneAPIService.fetchPharmGKBId(geneName!);
-
-        setState(() {
-          pharmGKBId = fetchedPharmGKBId;
-        });
-
-        // Check if the gene is already saved
-        _checkIfGeneIsSaved();
-      } else {
-        setState(() {
-          geneName = "No results found in ${widget.conditionName}.";
-          geneScore = null;
-          showResult = true;
-          otherConditionGenes = [];
-        });
-      }
-    }
   }
 
   Future<void> _saveGene() async {
@@ -116,17 +163,12 @@ class _SearchPageState extends State<SearchPage> {
           SnackBar(content: Text("Gene saved successfully!")),
         );
 
-        // Update saved status
         _checkIfGeneIsSaved();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Failed to save gene: $e")),
         );
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("No gene to save.")),
-      );
     }
   }
 
@@ -150,28 +192,109 @@ class _SearchPageState extends State<SearchPage> {
       SnackBar(content: Text("Gene unsaved successfully!")),
     );
 
-    // Update saved status
     _checkIfGeneIsSaved();
   }
 
-  Widget _buildSaveUnsaveButton() {
-    return ElevatedButton(
-      onPressed: isSaved ? _unsaveGene : _saveGene,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isSaved ? Colors.grey : Colors.blueGrey[900],
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
+  Future<void> _searchGene() async {
+    String enteredGene = geneController.text.trim();
+    if (enteredGene.isNotEmpty) {
+      setState(() {
+        isFetchingGene = true;
+        showResult = false;
+      });
+
+      final geneData = await geneService.fetchGeneAndCheckOtherConditions(widget.conditionName, enteredGene);
+      final currentConditionGenes = geneData['currentCondition'];
+      final fetchedOtherConditionGenes = geneData['otherConditions'];
+
+      if (currentConditionGenes.isNotEmpty) {
+        setState(() {
+          geneName = currentConditionGenes.first.geneName;
+          geneScore = currentConditionGenes.first.geneScore;
+          showResult = true;
+          otherConditionGenes = fetchedOtherConditionGenes;
+        });
+
+        final fetchedPharmGKBId = await geneAPIService.fetchPharmGKBId(geneName!);
+        setState(() {
+          pharmGKBId = fetchedPharmGKBId;
+        });
+
+        _checkIfGeneIsSaved();
+      } else {
+        setState(() {
+          geneName = "No results found in ${widget.conditionName}.";
+          geneScore = null;
+          showResult = true;
+          otherConditionGenes = [];
+        });
+      }
+
+      setState(() {
+        isFetchingGene = false;
+      });
+    }
+  }
+
+  Widget _buildDefaultGenes() {
+    final genes = defaultGenes[widget.conditionName] ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Top Genes in ${widget.conditionName}',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.blueGrey[900],
+          ),
         ),
-      ),
-      child: Text(
-        isSaved ? 'Unsave Gene' : 'Save Gene',
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+        SizedBox(height: 15),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: genes.length,
+          itemBuilder: (context, index) {
+            final gene = genes[index];
+            return Container(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue[50]!, Colors.blue[200]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: Offset(2, 3),
+                  ),
+                ],
+              ),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.blueGrey[100],
+                  child: Text(
+                    gene['name'][0], // First letter of gene name
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey[900]),
+                  ),
+                ),
+                title: Text(
+                  gene['name'],
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey[900]),
+                ),
+                subtitle: Text(
+                  'Score: ${gene['score']}',
+                  style: TextStyle(fontSize: 14, color: Colors.blueGrey[600]),
+                ),
+              ),
+            );
+          },
         ),
-      ),
+      ],
     );
   }
 
@@ -195,6 +318,27 @@ class _SearchPageState extends State<SearchPage> {
         showingTooltipIndicators: [0],
       );
     }).toList();
+  }
+
+  Widget _buildSaveUnsaveButton() {
+    return ElevatedButton(
+      onPressed: isSaved ? _unsaveGene : _saveGene,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSaved ? Colors.grey : Colors.blueGrey[900],
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+      ),
+      child: Text(
+        isSaved ? 'Unsave Gene' : 'Save Gene',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+    );
   }
 
   @override
@@ -257,7 +401,70 @@ class _SearchPageState extends State<SearchPage> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20),
-              if (showResult) ...[
+
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CausingDiseasesPage(conditionName: widget.conditionName),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueGrey[900],
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Text(
+                  'Causing Diseases',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              SizedBox(height: 15),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AssociatedDiseasesPage(conditionName: widget.conditionName),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueGrey[900],
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Text(
+                  'Associated Diseases',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+
+              if (showDefaultGenes) _buildDefaultGenes(),
+
+              if (isFetchingGene)
+                Center(
+                  child: CircularProgressIndicator(),
+                ),
+
+              SizedBox(height: 20),
+
+              if (!isFetchingGene && showResult) ...[
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -302,7 +509,7 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                       SizedBox(height: 20),
-                      _buildSaveUnsaveButton(), // Save/Unsave Button
+                      _buildSaveUnsaveButton(),
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
