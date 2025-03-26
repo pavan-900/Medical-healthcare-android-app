@@ -264,23 +264,27 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SizedBox(height: 5),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(5),
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          minHeight: 10,
-                          backgroundColor: Colors.grey[300],
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            progress < 0.5
-                                ? Colors.red
-                                : progress < 0.8
-                                ? Colors.orange
-                                : Colors.green,
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: SizedBox(
+                        height: 6, // Adjust height as needed
+                        width: double.infinity, // Use a fixed width for a professional look
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            backgroundColor: Colors.grey[300],
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              progress < 0.5
+                                  ? Colors.red
+                                  : progress < 0.8
+                                  ? Colors.orange
+                                  : Colors.green,
+                            ),
                           ),
                         ),
                       ),
                     ),
+
                     SizedBox(height: 5),
                     Text(
                       '${condition['genes']} of $totalGenes Genes',
